@@ -1,0 +1,326 @@
+
+#include <kipr/botball.h>
+#include <math.h>
+
+const int RMOTOR=0;
+const int LMOTOR=2;
+const int DOWN=614;
+const int ARM=2;
+const int CLAW=1;
+const int OPEN=1800;
+const int UP=1400;
+const int CLOSED=1192;
+const int TOOCLOSE=1500;
+const int TOOFAR=2400;
+void freezee()
+{
+    freeze(LMOTOR);
+    msleep(200);
+    freeze(RMOTOR);
+    msleep(200);
+
+}
+void motorstop()
+{
+    mav(RMOTOR,0);
+    mav(LMOTOR,0);
+    msleep(100);
+}
+void slow_set_servo_position_reverse(int port, int position)
+{
+    while(get_servo_position(port)>position)
+    {
+        set_servo_position(port,get_servo_position(port)-5);
+        msleep(10);
+    }
+}
+
+void slow_set_servo_position(int port, int position)
+{
+    while(get_servo_position(port)<position)
+    {
+        set_servo_position(port,get_servo_position(port)+5);
+        msleep(10);
+    }
+}
+void adjust()
+{
+    while(analog(0)<TOOCLOSE)
+    {
+
+        mav(RMOTOR,-1000);
+        mav(LMOTOR,1000);
+        msleep(700);
+        ao();
+        msleep(100);
+        mav(LMOTOR,-100);
+        mav(RMOTOR,-100);
+        msleep(500);
+        mav(RMOTOR,-1000);
+        mav(LMOTOR,1000);
+        msleep(700);
+    }
+}
+
+void move(int time)
+{
+    cmpc(RMOTOR);
+    msleep(100);
+    cmpc(LMOTOR);
+    msleep(100);
+    while(seconds()<time)
+    {
+        while(gmpc(RMOTOR)==gmpc(LMOTOR))
+        {
+            mav(RMOTOR,1500);
+            mav(LMOTOR,1500);
+            msleep(10);
+        }
+        while(gmpc(RMOTOR)<gmpc(LMOTOR))
+        {
+            mav(RMOTOR,1500);
+            mav(LMOTOR,500);
+            msleep(10);
+        }
+        while(gmpc(LMOTOR)<gmpc(RMOTOR))
+        {
+            mav(RMOTOR,500);
+            mav(LMOTOR,1500);
+            msleep(10);
+        }
+    }
+}
+void depth()
+{
+    while(analog(5)>1600);
+    {
+        mav(LMOTOR,-500);
+        mav(RMOTOR,-500);
+        msleep(1);
+    }
+    while(analog(5)<1600)
+    {
+        mav(LMOTOR,-500);
+        mav(RMOTOR,-500);
+        msleep(1);
+    }
+    freeze(LMOTOR);
+    //msleep(100);
+    freeze(RMOTOR);
+    msleep(100);
+
+}
+void grab2()
+{
+    ao();
+    msleep(100);
+    slow_set_servo_position_reverse(ARM,850);
+    msleep(100);
+
+    slow_set_servo_position(CLAW,1600);
+    msleep(1000);
+    mav(LMOTOR,-50);
+    mav(RMOTOR,50);
+    msleep(1000);
+
+    ao();
+    freezee();
+    msleep(100);
+
+
+    freezee();
+    ao();
+    msleep(100);
+    slow_set_servo_position_reverse(ARM,DOWN);
+    msleep(1000);
+    mav(LMOTOR,50);
+    mav(RMOTOR,-50);
+    msleep(1300);
+    ao();
+    msleep(100);
+    slow_set_servo_position_reverse(CLAW,800);
+    msleep(1000);
+
+
+}
+
+void grab()
+{
+
+    ao();
+    msleep(100);
+    slow_set_servo_position_reverse(ARM,850);
+    msleep(100);
+
+    slow_set_servo_position(CLAW,1375);
+    msleep(1000);
+
+    mav(LMOTOR,-50);
+    mav(RMOTOR,50);
+    msleep(1000);
+    ao();
+    freezee();
+    msleep(100);
+    freezee();
+    ao();
+    msleep(100);
+    slow_set_servo_position_reverse(ARM,DOWN);
+    msleep(1000);
+    mav(RMOTOR,-50);
+    mav(LMOTOR,50);
+    msleep(1300);
+    /*mav(LMOTOR,1000);
+    mav(RMOTOR,-1000);
+    msleep(120);*/
+    ao();
+    msleep(100);
+    slow_set_servo_position_reverse(CLAW,CLOSED-100);
+    msleep(1000);
+    slow_set_servo_position(ARM,1000);
+    msleep(100);
+}
+
+int main()
+{
+    wait_for_light(3);
+    msleep(100);
+    shut_down_in(118);
+    msleep(100);
+    setpwm(RMOTOR,100);
+    msleep(100);
+    setpwm(LMOTOR,100);
+    msleep(100);
+    printf("Correct1 version running");
+    msleep(2000);
+    enable_servos();
+    msleep(100);
+    set_servo_position(ARM,1476);
+    msleep(100);
+    set_servo_position(CLAW,OPEN);
+    msleep(1000);
+    mav(LMOTOR,1000);
+    mav(RMOTOR,-1000);
+    msleep(800);
+    mav(LMOTOR,-1000);
+    mav(RMOTOR,-1000);
+    msleep(1000);
+    mav(RMOTOR,1000);
+    mav(LMOTOR,-1000);
+    msleep(800);
+    ao();
+    msleep(100);
+    set_servo_position(ARM,DOWN);
+    msleep(1000);
+    msleep(100);
+    set_servo_position(CLAW,CLOSED);
+    msleep(100);
+    set_servo_position(ARM,UP);
+    msleep(100);
+    mav(LMOTOR,1000);
+    mav(RMOTOR,-1000);
+    msleep(1000);
+    mav(LMOTOR,1000);
+    mav(RMOTOR,1000);
+    msleep(1000);
+    ao();
+    msleep(100);
+
+    mav(LMOTOR,-1000);
+    mav(RMOTOR,1000);
+    msleep(1100);
+    mav(LMOTOR,1000);
+    mav(RMOTOR,1000);
+    msleep(8000);
+
+
+    ao();
+    msleep(5000);
+
+    mav(LMOTOR,-1000);
+    mav(RMOTOR,-1000);
+    msleep(9450);
+    ao();
+    msleep(100);
+    mav(LMOTOR,-1500);
+    mav(RMOTOR,-500);
+    msleep(1200);
+    ao();
+    msleep(100);
+    /*mav(LMOTOR,-1000);
+  mav(RMOTOR,-1000);
+  msleep(500);*/
+    ao();
+    msleep(100);
+
+    mav(LMOTOR,1000);
+    mav(RMOTOR,-1000);
+    msleep(1500);
+    mav(LMOTOR,1000);
+    mav(RMOTOR,1000);
+    msleep(7000);
+    slow_set_servo_position_reverse(ARM,DOWN);
+    msleep(100);
+    ao();
+    msleep(7000);
+	slow_set_servo_position(ARM,UP);
+    msleep(100);
+    mav(LMOTOR,-1000);
+    mav(RMOTOR,-1000);
+    msleep(1250);
+
+
+    mav(LMOTOR,-1000);
+    mav(RMOTOR,1000);
+    msleep(737);
+
+    while(abs(analog(0)-analog(5))>5)
+    {
+        printf("%d\n",analog(0));
+        mav(LMOTOR,-100);
+        mav(RMOTOR,100);
+        msleep(10);
+    }
+    freeze(LMOTOR);
+    msleep(100);
+    freeze(RMOTOR);
+    msleep(100);
+
+    mav(LMOTOR,-1000);
+    mav(RMOTOR,-1000);
+    msleep(2200);
+    int i=0;
+    for(i=0;i<2;i++){
+        depth();
+        msleep(100);
+        mav(RMOTOR,100);
+        mav(LMOTOR,100);
+        msleep(100);
+        grab();
+    }
+    depth();
+    msleep(100);
+    mav(RMOTOR,100);
+    mav(LMOTOR,100);
+    msleep(100);
+    grab2();
+    msleep(100);
+    slow_set_servo_position(ARM,818);
+    msleep(100);
+    mav(LMOTOR,500);
+    mav(RMOTOR,500);
+    msleep(500);
+    mav(LMOTOR,-500);
+    mav(RMOTOR,500);
+    msleep(1600);
+    //slow_set_servo_position(ARM,1024);
+
+    msleep(100);
+    mav(LMOTOR,1500);
+    mav(RMOTOR,1500);
+    msleep(3100);
+    ao();
+    msleep(100);
+    slow_set_servo_position_reverse(ARM,DOWN);
+    msleep(100);
+    return 0;
+}
