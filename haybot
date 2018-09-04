@@ -12,6 +12,7 @@ const int UP=1400;
 const int CLOSED=1192;
 const int TOOCLOSE=1500;
 const int TOOFAR=2400;
+//stops both motors
 void freezee()
 {
     freeze(LMOTOR);
@@ -26,6 +27,7 @@ void motorstop()
     mav(LMOTOR,0);
     msleep(100);
 }
+//moves a servo slowly in the negative direction
 void slow_set_servo_position_reverse(int port, int position)
 {
     while(get_servo_position(port)>position)
@@ -34,7 +36,7 @@ void slow_set_servo_position_reverse(int port, int position)
         msleep(10);
     }
 }
-
+//moves a servo slowly in the positive direction
 void slow_set_servo_position(int port, int position)
 {
     while(get_servo_position(port)<position)
@@ -43,6 +45,7 @@ void slow_set_servo_position(int port, int position)
         msleep(10);
     }
 }
+//need to remove. Original purpose was to get the robot in front of the haybale
 void adjust()
 {
     while(analog(0)<TOOCLOSE)
@@ -61,7 +64,7 @@ void adjust()
         msleep(700);
     }
 }
-
+//moves the robot forward
 void move(int time)
 {
     cmpc(RMOTOR);
@@ -90,6 +93,7 @@ void move(int time)
         }
     }
 }
+//finds the haybale
 void depth()
 {
     while(analog(5)>1600);
@@ -110,6 +114,7 @@ void depth()
     msleep(100);
 
 }
+//loose grab for first two haybales
 void grab2()
 {
     ao();
@@ -143,7 +148,7 @@ void grab2()
 
 
 }
-
+//tight grab for last haybale
 void grab()
 {
 
@@ -190,10 +195,11 @@ int main()
     msleep(100);
     setpwm(LMOTOR,100);
     msleep(100);
-    printf("Correct1 version running");
+    printf("Correct version running");
     msleep(2000);
     enable_servos();
     msleep(100);
+    //moves out of starting box
     set_servo_position(ARM,1476);
     msleep(100);
     set_servo_position(CLAW,OPEN);
@@ -231,8 +237,6 @@ int main()
     mav(LMOTOR,1000);
     mav(RMOTOR,1000);
     msleep(8000);
-
-
     ao();
     msleep(5000);
 
@@ -252,6 +256,7 @@ int main()
     ao();
     msleep(100);
 
+//gets robot inposition to stack
     mav(LMOTOR,1000);
     mav(RMOTOR,-1000);
     msleep(1500);
@@ -272,7 +277,7 @@ int main()
     mav(LMOTOR,-1000);
     mav(RMOTOR,1000);
     msleep(737);
-
+    //locates row of haybales
     while(abs(analog(0)-analog(5))>5)
     {
         printf("%d\n",analog(0));
@@ -284,7 +289,7 @@ int main()
     msleep(100);
     freeze(RMOTOR);
     msleep(100);
-
+//stacks the haybales
     mav(LMOTOR,-1000);
     mav(RMOTOR,-1000);
     msleep(2200);
@@ -304,6 +309,7 @@ int main()
     msleep(100);
     grab2();
     msleep(100);
+    //moves into the barn
     slow_set_servo_position(ARM,818);
     msleep(100);
     mav(LMOTOR,500);
